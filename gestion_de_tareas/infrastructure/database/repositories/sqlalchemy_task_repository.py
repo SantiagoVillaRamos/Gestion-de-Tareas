@@ -13,7 +13,9 @@ class InMemoryTaskRepository(TaskRepositoryPort):
 
     async def save(self, task: Task):
         self._tasks[task.id] = task
-        return task
+    
+    async def updated(self, task_id: Task, task_update_dto):
+        self._tasks[task_id.id] = task_id
 
     async def get_by_id(self, task_id: str) -> Optional[Task]:
         return self._tasks.get(task_id)

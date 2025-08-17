@@ -30,4 +30,6 @@ class TaskRepositoryPort(ABC):
         """Elimina una tarea por su ID."""
         pass
     
-    
+    @abstractmethod
+    async def updated(self, task_id: Task, task_update_dto):
+        pass

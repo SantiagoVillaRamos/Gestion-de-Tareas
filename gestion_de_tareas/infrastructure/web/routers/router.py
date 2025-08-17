@@ -1,14 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from typing import List, Annotated
 
-from infrastructure.web.dependencies import get_task_repository
+from infrastructure.web.dependencies import get_task_facade
 
-from domain.use_cases.create_task import CreateTaskUseCase
-from domain.use_cases.get_task_by_id import GetTaskByIdUseCase
-from domain.use_cases.get_all_tasks import GetAllTasksUseCase
-from domain.use_cases.delete_a_task import DeleteTaskUseCase
-from domain.use_cases.update_a_task import UpdateTaskUseCase
-from domain.ports.task_repository_port import TaskRepositoryPort
+from application.facade.task_facade import TasFacade
 
 from application.dtos.task_dtos import TaskCreateDTO, TaskUpdateDTO, TaskResponseDTO
 
@@ -27,12 +22,10 @@ router = APIRouter(
 )
 async def create_task(
     task_create_dto: TaskCreateDTO,
-    repo: Annotated[TaskRepositoryPort, Depends(get_task_repository)]
+    facade: Annotated[TasFacade, Depends(get_task_facade)]
 ) -> TaskResponseDTO:
     
-    use_case = CreateTaskUseCase(task_repository=repo)
-    task_entity = await use_case.execute(task_create_dto)
-    return task_entity
+    return await facade.save(task_create_dto)
     
     
 
@@ -42,15 +35,13 @@ async def create_task(
     summary="Obtener todas las tareas"
 )
 async def get_all_tasks(
-    repo: Annotated[TaskRepositoryPort, Depends(get_task_repository)]
+    facade: Annotated[TasFacade, Depends(get_task_facade)]
 ) -> List[TaskResponseDTO]:
     
-    use_case = GetAllTasksUseCase(task_repository=repo)
-    task_entity = await use_case.execute()
-    return task_entity
+    return await facade.get_all()
     
         
-        
+    
 @router.get(
     "/get_task/{task_id}",
     response_model=TaskResponseDTO,
@@ -58,12 +49,10 @@ async def get_all_tasks(
 )
 async def get_task_by_id(
     task_id: str,
-    repo: Annotated[TaskRepositoryPort, Depends(get_task_repository)]
+    facade: Annotated[TasFacade, Depends(get_task_facade)]
 ) -> TaskResponseDTO:
     
-    use_case = GetTaskByIdUseCase(task_repository=repo)
-    task_entity = await use_case.execute(task_id)
-    return task_entity
+    return await facade.get_by_id(task_id)
    
         
         
@@ -74,10 +63,9 @@ async def get_task_by_id(
 )
 async def delete_task(
     task_id: str,
-    repo: Annotated[TaskRepositoryPort, Depends(get_task_repository)]
+    facade: Annotated[TasFacade, Depends(get_task_facade)]
 ):
-    use_case = DeleteTaskUseCase(task_repository=repo)
-    await use_case.execute(task_id)
+    return await facade.delete_by_id(task_id)
     
         
 
@@ -89,13 +77,9 @@ async def delete_task(
 async def update_task(
     task_id: str,
     task_update_dto: TaskUpdateDTO,
-    repo: Annotated[TaskRepositoryPort, Depends(get_task_repository)]
+    facade: Annotated[TasFacade, Depends(get_task_facade)]
 ) -> TaskResponseDTO:
    
-    use_case = UpdateTaskUseCase(task_repository=repo)
-    task_entity = await use_case.execute(
-        task_id,
-        task_update_dto
-    )
-    return task_entity
+    return await facade.updated(task_id, task_update_dto)
+    
     

@@ -22,7 +22,7 @@ class UpdateTaskUseCase:
         task.update_status(task_update_dto.name, task_update_dto.description)
         task.complete()
         
-        await self.task_repository.save(task)
+        await self.task_repository.updated(task, task_update_dto)
         
         return TaskResponseDTO(
             id=task.id,

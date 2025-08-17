@@ -36,7 +36,7 @@ async def test_update_task_success():
     assert updated_task.status == TaskStatus.COMPLETED
     
     mock_repo.get_by_id.assert_called_once_with(mock_task_data.id)
-    mock_repo.save.assert_called_once()
+    mock_repo.updated.assert_called_once()
     
     
 @pytest.mark.asyncio
@@ -59,5 +59,5 @@ async def test_update_task_not_found():
     #Afirmar que el repositorio fue llamado una sola vez 
     mock_repo.get_by_id.assert_called_once_with("No se encontro el ID")
     # Verificamos que update NO fue llamado
-    mock_repo.save.assert_not_called()
+    mock_repo.updated.assert_not_called()
     
